@@ -5,6 +5,6 @@ WORKDIR /app
 COPY ./requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
-COPY ./client_mqtt.py ./client_mqtt.py
+COPY ./src .
 
 ENTRYPOINT [ "python3", "-u", "client_mqtt.py" ]
