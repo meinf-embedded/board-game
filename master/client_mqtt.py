@@ -1,6 +1,9 @@
-def main():
+import asyncio
+
+
+async def main():
     print("Hello world!")
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
