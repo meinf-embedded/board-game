@@ -1,5 +1,5 @@
-# board-game
-MQTT broker &amp; "master" for the {title} board game
+# Meeple Showdown
+MQTT broker &amp; Master
 ---
 
-Here will be the game rules, mqtt topic info, etc
+The [Game Rules](https://docs.google.com/document/d/1gMqOfDRfHpMNa9OvMC5w9BUMWLiUB5i4jyKh4eClsUI/edit?usp=sharing) for the Meeple Showdown.
