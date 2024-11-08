@@ -1,6 +1,6 @@
-#!/bin/ash
+#!/bin/bash
 
-set -e
+# set -e
 
 # Fix write permissions for mosquitto directories
 chown --no-dereference --recursive mosquitto /mosquitto/log

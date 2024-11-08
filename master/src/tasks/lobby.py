@@ -11,7 +11,7 @@ def _listen(game_lobby: GameLobby, message: aiomqtt.Message):
     logger.info("Received message", message)
 
 
-async def listen(mqtt_client: aiomqtt.Client, game_lobby: GameLobby):
+async def run(mqtt_client: aiomqtt.Client, game_lobby: GameLobby):
     while True:
         async with mqtt_client.messages() as messages:
             await mqtt_client.subscribe(TOPIC)
