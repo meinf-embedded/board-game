@@ -6,10 +6,11 @@ import sys
 import aiomqtt
 
 from game.types import GameLobby
+from game.callbacks import Callbacks
 
 from os import environ
 
-from tasks import player_state, hello
+from tasks import hello, player
 
 # MQTT settings
 MQTT_BROKER_HOST = str(environ.get("MQTT_BROKER_HOST", "localhost"))
@@ -37,7 +38,7 @@ def init_signal_handler():
 
 async def run_tasks(mqtt_client: aiomqtt.Client, game_lobby: GameLobby):
     async with asyncio.TaskGroup() as tg:
-        tg.create_task(player_state.run(mqtt_client, game_lobby))
+        tg.create_task(player.run(mqtt_client, game_lobby))
         tg.create_task(hello.run(mqtt_client))
 
 
@@ -53,7 +54,10 @@ async def main():
         clean_session=True,
     )
 
-    game_lobby = GameLobby(players_max=MAX_PLAYERS)
+    game_lobby = GameLobby(
+        players_max=MAX_PLAYERS,
+        callbacks=Callbacks(mqtt_client),
+    )
 
     while True:
         try:

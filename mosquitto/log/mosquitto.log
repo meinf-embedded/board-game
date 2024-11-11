@@ -287,3 +287,12 @@
 1731093152: mosquitto version 2.0.18 running
 1731093152: New connection from 172.19.0.3:33867 on port 1883.
 1731093152: New client connected from 172.19.0.3:33867 as auto-DB743E6D-BB44-2B91-0D61-987A84BD9EDC (p2, c1, k60, u'master').
+1731093373: mosquitto version 2.0.18 starting
+1731093373: Config loaded from /mosquitto/config/mosquitto.conf.
+1731093373: Opening ipv4 listen socket on port 1883.
+1731093373: Opening ipv6 listen socket on port 1883.
+1731093373: mosquitto version 2.0.18 running
+1731093374: New connection from 172.19.0.3:33437 on port 1883.
+1731093374: New client connected from 172.19.0.3:33437 as auto-641EFC4E-653C-E94B-1F7F-5FE8A31CEAA6 (p2, c1, k60, u'master').
+1731093391: Client auto-641EFC4E-653C-E94B-1F7F-5FE8A31CEAA6 closed its connection.
+1731093391: mosquitto version 2.0.18 terminating
