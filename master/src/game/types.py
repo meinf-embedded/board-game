@@ -40,6 +40,7 @@ class GameLobby:
 
         if new_state:
             self.gamestate = new_state
+            self.gamestate.init_state(self)
             self.callbacks.notify_game_state(new_state.value)
 
     def get_player(self, player_id: str, create=False) -> Union[Player, None]:
