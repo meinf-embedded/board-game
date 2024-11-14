@@ -2,7 +2,7 @@ import aiomqtt
 import logging
 import json
 
-from game.types import GameLobby, PlayerState, GameState
+from game.lobby import GameLobby, PlayerState, GameState
 
 logger = logging.getLogger(__name__)
 
@@ -43,15 +43,23 @@ def _actions_moved(game_lobby: GameLobby, player_id: str, payload):
 def _actions_ready_meeple(game_lobby: GameLobby, player_id: str, payload):
     logger.info(f"Received {player_id} join message {payload}")
 
-    payload = json.loads(payload)
-    game_lobby.add_meeple(payload)
+    if payload:
+        game_lobby.add_meeple(player_id)
+    else:
+        player = game_lobby.get_player(player_id)
+        if player:
+            player.ready_meeple = False
 
 
 def _actions_ready_base(game_lobby: GameLobby, player_id: str, payload):
     logger.info(f"Received player {player_id} join message {payload}")
 
-    payload = json.loads(payload)
-    game_lobby.add_base(payload)
+    if payload:
+        game_lobby.add_base(player_id)
+    else:
+        player = game_lobby.get_player(player_id)
+        if player:
+            player.ready_base = False
 
 
 def _listen(game_lobby: GameLobby, message: aiomqtt.Message):

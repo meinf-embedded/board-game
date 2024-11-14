@@ -1,7 +1,7 @@
 import aiomqtt
 
 from typing import Set
-from game.types import Player
+from game.lobby import Player
 
 
 class Callbacks:

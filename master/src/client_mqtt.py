@@ -5,7 +5,7 @@ import sys
 
 import aiomqtt
 
-from game.types import GameLobby
+from game.lobby import GameLobby
 from game.callbacks import Callbacks
 
 from os import environ

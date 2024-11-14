@@ -55,11 +55,16 @@ class GameLobby:
         return None
 
     def add_meeple(self, player_id: str):
+        if not self.gamestate == GameState.JOINING:
+            return
+
         player = self.get_player(player_id, create=True)
         player.ready_meeple = True
         self.state_check()
 
     def add_base(self, player_id: str):
+        if not self.gamestate == GameState.JOINING:
+            return
         player = self.get_player(player_id, create=True)
         player.ready_base = True
         self.state_check()
@@ -68,12 +73,15 @@ class GameLobby:
         return choice(self.players_remaining)
 
     def reset(self):
-        self.players_remaining = self.players.copy()
         for player in self.players:
             player.has_moved = False
             player.state = PlayerState.IDLE
+        self.players_remaining = self.players.copy()
 
     def player_die(self, player_id: str):
+        if not self.gamestate == GameState.SHOOTING:
+            return
+
         player = self.get_player(player_id)
         if not player:
             return
@@ -83,6 +91,9 @@ class GameLobby:
         self.state_check()
 
     def player_move(self, player_id: str):
+        if not self.gamestate == GameState.MOVING:
+            return
+
         player = self.get_player(player_id)
         if not player:
             return
@@ -91,6 +102,9 @@ class GameLobby:
         self.state_check()
 
     def player_shoot(self, player_id: str, is_shoot: bool):
+        if not self.gamestate == GameState.SHOOTING:
+            return
+
         player = self.get_player(player_id)
         if not player:
             return

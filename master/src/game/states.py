@@ -42,7 +42,7 @@ class JOINING(GameState):
         # Check whether everyone that joined is ready
         if len(game_lobby.players) == game_lobby.players_max:
             game_lobby.players_remaining.update(game_lobby.players)
-            return SHOOTING
+            return MOVING
 
     @classmethod
     def init_state(
@@ -95,6 +95,7 @@ class SHOOTING(GameState):
     ) -> Union["GameState", None]:
         if len(game_lobby.players_remaining) == 1:
             return ENDING
+        return MOVING
 
     @classmethod
     def init_state(
@@ -111,7 +112,6 @@ class SHOOTING(GameState):
         game_lobby.callbacks.notify_player_has_bullet(
             game_lobby.players_remaining, random_player.id
         )
-        return SHOOTING
 
 
 class ENDING(GameState):
