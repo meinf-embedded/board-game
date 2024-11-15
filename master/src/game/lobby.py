@@ -29,7 +29,7 @@ class GameLobby:
 
         if new_state:
             self.gamestate = new_state
-            await self.callbacks.notify_game_state(type(new_state).__name__)
+            await self.callbacks.notify_game_state(new_state.value())
             await self.gamestate.init_state(self)
 
     def get_player(self, player_id: str, create=False) -> Union[Player, None]:

@@ -28,6 +28,10 @@ class Player:
 
 
 class GameState(ABC):
+
+    def value(cls) -> str:
+        return ""
+
     @classmethod
     @abstractmethod
     async def check_state(

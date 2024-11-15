@@ -9,6 +9,10 @@ from game.types import GameState, PlayerState
 class JOINING(GameState):
 
     @classmethod
+    def value(cls):
+        return "joining"
+
+    @classmethod
     async def check_state(
         cls,
         game_lobby,
@@ -27,6 +31,10 @@ class JOINING(GameState):
 
 
 class MOVING(GameState):
+
+    @classmethod
+    def value(cls):
+        return "moving"
 
     @classmethod
     async def check_state(
@@ -63,6 +71,10 @@ class MOVING(GameState):
 class SHOOTING(GameState):
 
     @classmethod
+    def value(cls):
+        return "shooting"
+
+    @classmethod
     async def check_state(
         cls,
         game_lobby,
@@ -89,6 +101,10 @@ class SHOOTING(GameState):
 
 
 class ENDING(GameState):
+
+    @classmethod
+    def value(cls):
+        return "ending"
 
     @classmethod
     async def check_state(

@@ -1,12 +1,11 @@
 import aiomqtt
 import logging
-import json
 
 from game.lobby import GameLobby, PlayerState, GameState
 
 logger = logging.getLogger(__name__)
 
-TOPIC = "players/#"
+TOPIC = "players/+/actions/#"
 
 
 async def _actions_die(game_lobby: GameLobby, player_id: str, payload):
