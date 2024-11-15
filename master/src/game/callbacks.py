@@ -28,4 +28,4 @@ class Callbacks:
 
     async def notify_player_has_died(self, player_id: str):
         # TODO: Notify player has died topic
-        await self.mqtt_client.publish(f"player/{player_id}/state/dead", 1)
+        await self.mqtt_client.publish(f"player/{player_id}/state/has_died", 1)

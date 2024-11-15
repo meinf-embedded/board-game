@@ -1,41 +1,15 @@
 import logging
 
-from abc import ABC, abstractmethod
 from typing import Union
-from enum import Enum
 
 from random import choice
-
-
-class PlayerState(Enum):
-    IDLE = 0
-    MOVING = 1
-    WITH_BULLET = 2
-    DEAD = 3
-
-
-class GameState(ABC):
-    @classmethod
-    @abstractmethod
-    def check_state(
-        cls,
-        game_lobby,
-    ) -> Union["GameState", None]:
-        raise NotImplementedError
-
-    @classmethod
-    @abstractmethod
-    def init_state(
-        cls,
-        game_lobby,
-    ):
-        raise NotImplementedError
+from game.types import GameState, PlayerState
 
 
 class JOINING(GameState):
 
     @classmethod
-    def check_state(
+    async def check_state(
         cls,
         game_lobby,
     ) -> Union["GameState", None]:
@@ -45,7 +19,7 @@ class JOINING(GameState):
             return MOVING
 
     @classmethod
-    def init_state(
+    async def init_state(
         cls,
         game_lobby,
     ):
@@ -55,26 +29,26 @@ class JOINING(GameState):
 class MOVING(GameState):
 
     @classmethod
-    def check_state(
+    async def check_state(
         cls,
         game_lobby,
     ) -> Union["GameState", None]:
         # Check whether everyone has moved
         if all(player.has_moved() for player in game_lobby.players_remaining):
             return SHOOTING
-        cls._notify_player_moving_turn(game_lobby)
+        await cls._notify_player_moving_turn(game_lobby)
 
     @classmethod
-    def init_state(
+    async def init_state(
         cls,
         game_lobby,
     ):
         for player in game_lobby.players_remaining:
             player.state = PlayerState.MOVING
-        cls._notify_player_moving_turn(game_lobby)
+        await cls._notify_player_moving_turn(game_lobby)
 
     @classmethod
-    def _notify_player_moving_turn(cls, game_lobby):
+    async def _notify_player_moving_turn(cls, game_lobby):
         player = choice(
             [
                 player
@@ -83,13 +57,13 @@ class MOVING(GameState):
             ]
         )
         logging.info(f"Player {player.id} moving turn")
-        game_lobby.callbacks.notify_player_moving_turn(player.id)
+        await game_lobby.callbacks.notify_player_moving_turn(player.id)
 
 
 class SHOOTING(GameState):
 
     @classmethod
-    def check_state(
+    async def check_state(
         cls,
         game_lobby,
     ) -> Union["GameState", None]:
@@ -98,7 +72,7 @@ class SHOOTING(GameState):
         return MOVING
 
     @classmethod
-    def init_state(
+    async def init_state(
         cls,
         game_lobby,
     ):
@@ -109,7 +83,7 @@ class SHOOTING(GameState):
         logging.info(f"Player {random_player.id} has bullet")
 
         random_player.state = PlayerState.WITH_BULLET
-        game_lobby.callbacks.notify_player_has_bullet(
+        await game_lobby.callbacks.notify_player_has_bullet(
             game_lobby.players_remaining, random_player.id
         )
 
@@ -117,7 +91,7 @@ class SHOOTING(GameState):
 class ENDING(GameState):
 
     @classmethod
-    def check_state(
+    async def check_state(
         cls,
         game_lobby,
     ) -> Union["GameState", None]:
@@ -126,7 +100,7 @@ class ENDING(GameState):
         return MOVING
 
     @classmethod
-    def init_state(
+    async def init_state(
         cls,
         game_lobby,
     ): ...

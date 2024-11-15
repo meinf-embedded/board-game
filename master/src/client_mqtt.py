@@ -39,7 +39,7 @@ def init_signal_handler():
 async def run_tasks(mqtt_client: aiomqtt.Client, game_lobby: GameLobby):
     async with asyncio.TaskGroup() as tg:
         tg.create_task(player.run(mqtt_client, game_lobby))
-        tg.create_task(hello.run(mqtt_client))
+        # tg.create_task(hello.run(mqtt_client))
 
 
 async def main():

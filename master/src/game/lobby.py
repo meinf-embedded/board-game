@@ -6,42 +6,31 @@ from typing import Set, Union
 
 import logging
 
+from game.types import Player, GameState
 from game.callbacks import Callbacks
-from game.states import GameState, PlayerState
+from game.states import PlayerState, JOINING, MOVING, SHOOTING, ENDING
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 
 @dataclass
-class Player:
-    id: str
-    state: PlayerState = PlayerState.IDLE
-    ready_meeple: bool = False
-    ready_base: bool = False
-    has_moved: bool = False
-
-    def is_ready(self):
-        return self.ready_meeple and self.ready_base
-
-
-@dataclass
 class GameLobby:
-    gamestate: GameState = GameState.JOINING
+    gamestate: GameState = JOINING
     player_ids: Set[str] = field(default_factory=set)
     players: Set[Player] = field(default_factory=set)
     players_remaining: Set[Player] = field(default_factory=set)
     players_max: int = 1
     no_shoot_penalty: float = 0.5
 
-    callbacks: Callbacks
+    callbacks: Callbacks = None
 
-    def state_check(self):
-        new_state = self.gamestate.check_state(self)
+    async def state_check(self):
+        new_state = await self.gamestate.check_state(self)
 
         if new_state:
             self.gamestate = new_state
-            self.gamestate.init_state(self)
-            self.callbacks.notify_game_state(new_state.value)
+            await self.callbacks.notify_game_state(type(new_state).__name__)
+            await self.gamestate.init_state(self)
 
     def get_player(self, player_id: str, create=False) -> Union[Player, None]:
         for player in self.players:
@@ -54,20 +43,20 @@ class GameLobby:
             return player
         return None
 
-    def add_meeple(self, player_id: str):
-        if not self.gamestate == GameState.JOINING:
+    async def add_meeple(self, player_id: str):
+        if not self.gamestate == JOINING:
             return
 
         player = self.get_player(player_id, create=True)
         player.ready_meeple = True
-        self.state_check()
+        await self.state_check()
 
-    def add_base(self, player_id: str):
-        if not self.gamestate == GameState.JOINING:
+    async def add_base(self, player_id: str):
+        if not self.gamestate == JOINING:
             return
         player = self.get_player(player_id, create=True)
         player.ready_base = True
-        self.state_check()
+        await self.state_check()
 
     def get_random_player(self):
         return choice(self.players_remaining)
@@ -78,8 +67,8 @@ class GameLobby:
             player.state = PlayerState.IDLE
         self.players_remaining = self.players.copy()
 
-    def player_die(self, player_id: str):
-        if not self.gamestate == GameState.SHOOTING:
+    async def player_die(self, player_id: str):
+        if not self.gamestate == SHOOTING:
             return
 
         player = self.get_player(player_id)
@@ -88,10 +77,10 @@ class GameLobby:
 
         player.state = PlayerState.DEAD
         self.players_remaining.remove(player)
-        self.state_check()
+        await self.state_check()
 
-    def player_move(self, player_id: str):
-        if not self.gamestate == GameState.MOVING:
+    async def player_move(self, player_id: str):
+        if not self.gamestate == MOVING:
             return
 
         player = self.get_player(player_id)
@@ -99,10 +88,10 @@ class GameLobby:
             return
 
         player.has_moved = True
-        self.state_check()
+        await self.state_check()
 
-    def player_shoot(self, player_id: str, is_shoot: bool):
-        if not self.gamestate == GameState.SHOOTING:
+    async def player_shoot(self, player_id: str, is_shoot: bool):
+        if not self.gamestate == SHOOTING:
             return
 
         player = self.get_player(player_id)
@@ -115,4 +104,4 @@ class GameLobby:
                 self.players_remaining.remove(player)
                 self.callbacks.notify_player_has_died(player.id)
 
-        self.state_check()
+        await self.state_check()
