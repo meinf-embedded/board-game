@@ -1,4 +1,5 @@
 import logging
+import asyncio
 
 from typing import Union
 
@@ -57,15 +58,18 @@ class MOVING(GameState):
 
     @classmethod
     async def _notify_player_moving_turn(cls, game_lobby):
-        player = choice(
+        moving_player = choice(
             [
                 player
                 for player in game_lobby.players_remaining
                 if player.state == PlayerState.MOVING
             ]
         )
-        logging.info(f"Player {player.id} moving turn")
-        await game_lobby.callbacks.notify_player_moving_turn(player.id)
+        logging.info(f"Player {moving_player.id} moving turn")
+        for player in game_lobby.players_remaining:
+            await game_lobby.callbacks.notify_player_moving_turn(
+                player.id, player.id == moving_player.id
+            )
 
 
 class SHOOTING(GameState):
@@ -112,6 +116,9 @@ class ENDING(GameState):
         game_lobby,
     ) -> Union["GameState", None]:
         logging.info(f"Game ended, winner is {game_lobby.players_remaining.pop().id}")
+        await cls._notify_winner(game_lobby)
+
+        await asyncio.sleep(10)
         game_lobby.reset()
         return MOVING
 
@@ -120,3 +127,8 @@ class ENDING(GameState):
         cls,
         game_lobby,
     ): ...
+
+    async def _notify_winner(cls, game_lobby):
+        winner = game_lobby.players_remaining.pop()
+        await game_lobby.callbacks.notify_player_won(winner.id, 1)
+        logging.info(f"Player {winner.id} won")

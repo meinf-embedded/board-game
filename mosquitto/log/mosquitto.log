@@ -551,3 +551,137 @@
 1731677164: New client connected from 172.19.0.3:46963 as auto-4D7218B8-BFBA-B132-5A95-B5F24B49ACFC (p2, c1, k60, u'master').
 1731677180: New connection from 172.19.0.1:38340 on port 1883.
 1731677180: New client connected from 172.19.0.1:38340 as duo_jc (p2, c1, k15, u'duo_jc').
+1731677360: mosquitto version 2.0.18 starting
+1731677360: Config loaded from /mosquitto/config/mosquitto.conf.
+1731677360: Opening ipv4 listen socket on port 1883.
+1731677360: Opening ipv6 listen socket on port 1883.
+1731677360: mosquitto version 2.0.18 running
+1731677360: New connection from 172.19.0.3:42041 on port 1883.
+1731677360: New client connected from 172.19.0.3:42041 as auto-705737E6-479A-0850-CD3D-5C5452B538FF (p2, c1, k60, u'master').
+1731677364: New connection from 172.19.0.1:42438 on port 1883.
+1731677364: New client connected from 172.19.0.1:42438 as duo_jc (p2, c1, k15, u'duo_jc').
+1731677397: mosquitto version 2.0.18 starting
+1731677397: Config loaded from /mosquitto/config/mosquitto.conf.
+1731677397: Opening ipv4 listen socket on port 1883.
+1731677397: Opening ipv6 listen socket on port 1883.
+1731677397: mosquitto version 2.0.18 running
+1731677397: New connection from 172.19.0.3:52235 on port 1883.
+1731677397: New client connected from 172.19.0.3:52235 as auto-D9EE2A93-3BFC-379D-5D7D-510829EA1E91 (p2, c1, k60, u'master').
+1731677405: New connection from 172.19.0.1:49048 on port 1883.
+1731677405: New client connected from 172.19.0.1:49048 as duo_jc (p2, c1, k15, u'duo_jc').
+1731677475: Client duo_jc has exceeded timeout, disconnecting.
+1731680703: Client auto-D9EE2A93-3BFC-379D-5D7D-510829EA1E91 closed its connection.
+1731680722: mosquitto version 2.0.18 starting
+1731680722: Config loaded from /mosquitto/config/mosquitto.conf.
+1731680722: Opening ipv4 listen socket on port 1883.
+1731680722: Opening ipv6 listen socket on port 1883.
+1731680722: mosquitto version 2.0.18 running
+1731680722: New connection from 172.19.0.3:44119 on port 1883.
+1731680722: New client connected from 172.19.0.3:44119 as auto-9365E49B-2E26-6C65-E2B1-5E0372976870 (p2, c1, k60, u'master').
+1731680767: New connection from 172.19.0.1:41780 on port 1883.
+1731680767: New client connected from 172.19.0.1:41780 as duo_jc (p2, c1, k15, u'duo_jc').
+1731680805: Client duo_jc has exceeded timeout, disconnecting.
+1731680807: New connection from 172.19.0.1:60884 on port 1883.
+1731680807: New client connected from 172.19.0.1:60884 as duo_jc (p2, c1, k15, u'duo_jc').
+1731680829: Client duo_jc has exceeded timeout, disconnecting.
+1731681094: New connection from 172.19.0.1:56342 on port 1883.
+1731681094: New client connected from 172.19.0.1:56342 as duo_jc (p2, c1, k15, u'duo_jc').
+1731681117: Client duo_jc has exceeded timeout, disconnecting.
+1731681140: New connection from 172.19.0.1:47840 on port 1883.
+1731681140: New client connected from 172.19.0.1:47840 as duo_jc (p2, c1, k15, u'duo_jc').
+1731681165: Client duo_jc has exceeded timeout, disconnecting.
+1731691309: mosquitto version 2.0.18 starting
+1731691309: Config loaded from /mosquitto/config/mosquitto.conf.
+1731691309: Opening ipv4 listen socket on port 1883.
+1731691309: Opening ipv6 listen socket on port 1883.
+1731691309: mosquitto version 2.0.18 running
+1731691337: mosquitto version 2.0.18 terminating
+1731691339: mosquitto version 2.0.18 starting
+1731691339: Config loaded from /mosquitto/config/mosquitto.conf.
+1731691339: Opening ipv4 listen socket on port 1883.
+1731691339: Opening ipv6 listen socket on port 1883.
+1731691339: mosquitto version 2.0.18 running
+1731691340: New connection from 172.19.0.3:60485 on port 1883.
+1731691340: New client connected from 172.19.0.3:60485 as auto-227458A2-4ABA-C570-B00D-6097E0253CCF (p2, c1, k60, u'master').
+1731693450: New connection from 172.19.0.1:60122 on port 1883.
+1731693450: New client connected from 172.19.0.1:60122 as duo_jc (p2, c1, k15, u'duo_jc').
+1731693540: mosquitto version 2.0.18 starting
+1731693540: Config loaded from /mosquitto/config/mosquitto.conf.
+1731693540: Opening ipv4 listen socket on port 1883.
+1731693540: Opening ipv6 listen socket on port 1883.
+1731693540: mosquitto version 2.0.18 running
+1731693541: New connection from 172.19.0.3:46449 on port 1883.
+1731693541: New client connected from 172.19.0.3:46449 as auto-5AF9D479-6084-A32B-D0AC-9BDB922AF1E6 (p2, c1, k60, u'master').
+1731693546: New connection from 172.19.0.1:54232 on port 1883.
+1731693546: New client connected from 172.19.0.1:54232 as duo_jc (p2, c1, k15, u'duo_jc').
+1731693618: Client duo_jc has exceeded timeout, disconnecting.
+1731694066: New connection from 172.19.0.1:59796 on port 1883.
+1731694066: New client connected from 172.19.0.1:59796 as duo_jc (p2, c1, k15, u'duo_jc').
+1731694104: Client duo_jc has exceeded timeout, disconnecting.
+1731694465: New connection from 172.19.0.1:51546 on port 1883.
+1731694465: New client connected from 172.19.0.1:51546 as duo_jc (p2, c1, k15, u'duo_jc').
+1731694488: Client duo_jc has exceeded timeout, disconnecting.
+1731694931: New connection from 172.19.0.1:56614 on port 1883.
+1731694931: New client connected from 172.19.0.1:56614 as duo_jc (p2, c1, k15, u'duo_jc').
+1731694974: Client duo_jc has exceeded timeout, disconnecting.
+1731694978: New connection from 172.19.0.1:38990 on port 1883.
+1731694978: New client connected from 172.19.0.1:38990 as duo_jc (p2, c1, k15, u'duo_jc').
+1731695004: Client duo_jc has exceeded timeout, disconnecting.
+1731695040: New connection from 172.19.0.1:47090 on port 1883.
+1731695040: New client connected from 172.19.0.1:47090 as duo_jc (p2, c1, k15, u'duo_jc').
+1731695435: mosquitto version 2.0.18 starting
+1731695435: Config loaded from /mosquitto/config/mosquitto.conf.
+1731695435: Opening ipv4 listen socket on port 1883.
+1731695435: Opening ipv6 listen socket on port 1883.
+1731695435: mosquitto version 2.0.18 running
+1731695436: New connection from 172.19.0.3:42123 on port 1883.
+1731695436: New client connected from 172.19.0.3:42123 as auto-7AB558F6-B4A1-7C6E-3E48-0DC69713310D (p2, c1, k60, u'master').
+1731695437: New connection from 172.19.0.1:42172 on port 1883.
+1731695437: New client connected from 172.19.0.1:42172 as duo_jc (p2, c1, k15, u'duo_jc').
+1731695631: Client auto-7AB558F6-B4A1-7C6E-3E48-0DC69713310D closed its connection.
+1731695631: mosquitto version 2.0.18 terminating
+1731696208: mosquitto version 2.0.18 starting
+1731696208: Config loaded from /mosquitto/config/mosquitto.conf.
+1731696208: Opening ipv4 listen socket on port 1883.
+1731696208: Opening ipv6 listen socket on port 1883.
+1731696208: mosquitto version 2.0.18 running
+1731696209: New connection from 172.19.0.3:56059 on port 1883.
+1731696209: New client connected from 172.19.0.3:56059 as auto-9E24085D-83C4-0EE3-0BE6-0DCCB5163656 (p2, c1, k60, u'master').
+1731696213: New connection from 172.19.0.1:35406 on port 1883.
+1731696213: New client connected from 172.19.0.1:35406 as duo_jc (p2, c1, k15, u'duo_jc').
+1731696369: mosquitto version 2.0.18 starting
+1731696369: Config loaded from /mosquitto/config/mosquitto.conf.
+1731696369: Opening ipv4 listen socket on port 1883.
+1731696369: Opening ipv6 listen socket on port 1883.
+1731696369: mosquitto version 2.0.18 running
+1731696369: New connection from 172.19.0.1:33950 on port 1883.
+1731696369: New client connected from 172.19.0.1:33950 as duo_jc (p2, c1, k15, u'duo_jc').
+1731696369: New connection from 172.19.0.3:60211 on port 1883.
+1731696369: New client connected from 172.19.0.3:60211 as auto-8BC912BF-0D7B-8B20-FDD5-F70FCE52428F (p2, c1, k60, u'master').
+1731696919: mosquitto version 2.0.18 starting
+1731696919: Config loaded from /mosquitto/config/mosquitto.conf.
+1731696919: Opening ipv4 listen socket on port 1883.
+1731696919: Opening ipv6 listen socket on port 1883.
+1731696919: mosquitto version 2.0.18 running
+1731696920: New connection from 172.19.0.3:44657 on port 1883.
+1731696920: New client connected from 172.19.0.3:44657 as auto-98F931E9-DF5B-DE0D-6D37-6B9147CFE5D3 (p2, c1, k60, u'master').
+1731696922: New connection from 172.19.0.1:57166 on port 1883.
+1731696922: New client connected from 172.19.0.1:57166 as duo_jc (p2, c1, k15, u'duo_jc').
+1731696961: Client duo_jc has exceeded timeout, disconnecting.
+1731697078: New connection from 172.19.0.1:43036 on port 1883.
+1731697078: New client connected from 172.19.0.1:43036 as duo_jc (p2, c1, k15, u'duo_jc').
+1731697147: Client duo_jc has exceeded timeout, disconnecting.
+1731697194: New connection from 172.19.0.1:35706 on port 1883.
+1731697194: New client connected from 172.19.0.1:35706 as duo_jc (p2, c1, k15, u'duo_jc').
+1731697345: mosquitto version 2.0.18 starting
+1731697345: Config loaded from /mosquitto/config/mosquitto.conf.
+1731697345: Opening ipv4 listen socket on port 1883.
+1731697345: Opening ipv6 listen socket on port 1883.
+1731697345: mosquitto version 2.0.18 running
+1731697346: New connection from 172.19.0.1:55590 on port 1883.
+1731697346: New client connected from 172.19.0.1:55590 as duo_jc (p2, c1, k15, u'duo_jc').
+1731697346: New connection from 172.19.0.3:57413 on port 1883.
+1731697346: New client connected from 172.19.0.3:57413 as auto-F395E687-7904-EBC0-4161-2C564EDD8B1C (p2, c1, k60, u'master').
+1731697369: Client duo_jc has exceeded timeout, disconnecting.
+1731697372: New connection from 172.19.0.1:40732 on port 1883.
+1731697372: New client connected from 172.19.0.1:40732 as duo_jc (p2, c1, k15, u'duo_jc').

@@ -20,7 +20,7 @@ class GameLobby:
     players: Set[Player] = field(default_factory=set)
     players_remaining: Set[Player] = field(default_factory=set)
     players_max: int = 1
-    no_shoot_penalty: float = 0.5
+    no_shoot_penalty: float = 0.33
 
     callbacks: Callbacks = None
 
@@ -100,8 +100,11 @@ class GameLobby:
 
         player.state = PlayerState.IDLE
         if not is_shoot:
+            die = False
             if randint(0, 100) > self.no_shoot_penalty * 100:
                 self.players_remaining.remove(player)
-                self.callbacks.notify_player_has_died(player.id)
+                die = True
+
+            self.callbacks.notify_player_has_died(player.id, die)
 
         await self.state_check()
