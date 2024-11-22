@@ -20,7 +20,7 @@ class JOINING(GameState):
     ) -> Union["GameState", None]:
         # Check whether everyone that joined is ready
         if len(game_lobby.players) == game_lobby.players_max:
-            game_lobby.players_remaining.update(game_lobby.players)
+            game_lobby.players_remaining.append(*game_lobby.players)
             return MOVING
 
     @classmethod
@@ -43,7 +43,7 @@ class MOVING(GameState):
         game_lobby,
     ) -> Union["GameState", None]:
         # Check whether everyone has moved
-        if all(player.has_moved() for player in game_lobby.players_remaining):
+        if all(player.has_moved for player in game_lobby.players_remaining):
             return SHOOTING
         await cls._notify_player_moving_turn(game_lobby)
 
@@ -93,7 +93,7 @@ class SHOOTING(GameState):
         game_lobby,
     ):
         for player in game_lobby.players_remaining:
-            player.state = PlayerState.SHOOTING
+            player.state = PlayerState.IDLE
         random_player = game_lobby.get_random_player()
 
         logging.info(f"Player {random_player.id} has bullet")

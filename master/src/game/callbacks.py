@@ -33,7 +33,7 @@ class Callbacks:
         remaining_players: Set[Player],
         has_bullet_player_id: str,
     ):
-        async for player in remaining_players:
+        for player in remaining_players:
             await self._publish(
                 f"players/{player.id}/state/has_bullet",
                 has_bullet_player_id == player.id,

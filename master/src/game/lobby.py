@@ -2,7 +2,7 @@ import sys
 from dataclasses import dataclass, field
 from random import choice, randint
 
-from typing import Set, Union
+from typing import List, Set, Union
 
 import logging
 
@@ -18,7 +18,7 @@ class GameLobby:
     gamestate: GameState = JOINING
     player_ids: Set[str] = field(default_factory=set)
     players: Set[Player] = field(default_factory=set)
-    players_remaining: Set[Player] = field(default_factory=set)
+    players_remaining: List[Player] = field(default_factory=list)
     players_max: int = 1
     no_shoot_penalty: float = 0.33
 
@@ -81,10 +81,14 @@ class GameLobby:
 
     async def player_move(self, player_id: str):
         if not self.gamestate == MOVING:
+            logging.error(
+                f"Player {player_id} tried to move in gamestate {self.gamestate}"
+            )
             return
 
         player = self.get_player(player_id)
         if not player:
+            logging.error(f"Player {player_id} not found")
             return
 
         player.has_moved = True
