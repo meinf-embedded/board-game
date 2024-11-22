@@ -3,7 +3,7 @@ import asyncio
 
 from typing import Union
 
-from random import choice
+from random import choice, randint
 from game.types import GameState, PlayerState
 
 
@@ -54,7 +54,8 @@ class MOVING(GameState):
     ):
         for player in game_lobby.players_remaining:
             player.state = PlayerState.MOVING
-        await cls._notify_player_moving_turn(game_lobby)
+        if len(game_lobby.players_remaining) > 0:
+            await cls._notify_player_moving_turn(game_lobby)
 
     @classmethod
     async def _notify_player_moving_turn(cls, game_lobby):
@@ -102,6 +103,45 @@ class SHOOTING(GameState):
         await game_lobby.callbacks.notify_player_has_bullet(
             game_lobby.players_remaining, random_player.id
         )
+
+        asyncio.create_task(cls.wait_decision(game_lobby, random_player))
+
+    async def wait_decision(game_lobby, player):
+        game_lobby.decision.decided.acquire(timeout=game_lobby.decision.timeout)
+
+        await game_lobby.callbacks.notify_player_has_bullet(
+            game_lobby.players_remaining, player.id
+        )
+
+        if game_lobby.decision.decision:
+            # Wait for deaths
+            logging.log(f"Player {player.id} shot... WAITING FOR DEATHS")
+
+            await asyncio.sleep(game_lobby.death_wait_time)
+            if game_lobby.any_died:
+                game_lobby.any_died = False
+                logging.log(f"Player {player.id} shot and someone died")
+            else:
+                logging.log(f"Player {player.id} shot and no one died")
+                game_lobby.players_remaining.remove(player)
+                game_lobby.callbacks.notify_player_has_died(player.id, 1)
+
+        else:
+            # Randomize player death
+            die = False
+            if randint(0, 100) > game_lobby.decision.negative_penalty * 100:
+                player.state = PlayerState.DEAD
+                game_lobby.players_remaining.remove(player)
+                die = True
+
+            logging.info(
+                f"Player {player.id} didn't shoot and {'died' if die else 'survived'}"
+            )
+
+            await game_lobby.callbacks.notify_player_has_died(player.id, die)
+
+        game_lobby.decision.decided.release()
+        await game_lobby.state_check()
 
 
 class ENDING(GameState):

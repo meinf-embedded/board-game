@@ -5,12 +5,21 @@ from random import choice, randint
 from typing import List, Set, Union
 
 import logging
+import threading
 
 from game.types import Player, GameState
 from game.callbacks import Callbacks
 from game.states import PlayerState, JOINING, MOVING, SHOOTING, ENDING
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
+
+@dataclass
+class Decision:
+    decided: threading.Semaphore = field(default_factory=threading.Semaphore)
+    decision: bool = False
+    timeout: int = 10
+    negative_penalty: float = 0.33
 
 
 @dataclass
@@ -21,6 +30,11 @@ class GameLobby:
     players_remaining: List[Player] = field(default_factory=list)
     players_max: int = 1
     no_shoot_penalty: float = 0.33
+
+    decision: Decision = field(default_factory=Decision)
+
+    any_died: bool = False
+    death_wait_time: int = 5
 
     callbacks: Callbacks = None
 
@@ -103,12 +117,5 @@ class GameLobby:
             return
 
         player.state = PlayerState.IDLE
-        if not is_shoot:
-            die = False
-            if randint(0, 100) > self.no_shoot_penalty * 100:
-                self.players_remaining.remove(player)
-                die = True
-
-            self.callbacks.notify_player_has_died(player.id, die)
-
-        await self.state_check()
+        self.decision.decision = is_shoot
+        self.decision.decided.release()
