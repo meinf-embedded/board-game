@@ -84,7 +84,7 @@ class SHOOTING(GameState):
         cls,
         game_lobby,
     ) -> Union["GameState", None]:
-        if len(game_lobby.players_remaining) == 1:
+        if len(game_lobby.players_remaining) <= 1:
             return ENDING
         return MOVING
 
@@ -93,6 +93,8 @@ class SHOOTING(GameState):
         cls,
         game_lobby,
     ):
+        game_lobby.decision.decided.acquire()
+
         for player in game_lobby.players_remaining:
             player.state = PlayerState.IDLE
         random_player = game_lobby.get_random_player()
@@ -104,14 +106,13 @@ class SHOOTING(GameState):
             game_lobby.players_remaining, random_player.id
         )
 
-        asyncio.create_task(cls.wait_decision(game_lobby, random_player))
+        await asyncio.create_task(cls.wait_decision(game_lobby, random_player))
 
     async def wait_decision(game_lobby, player):
-        game_lobby.decision.decided.acquire(timeout=game_lobby.decision.timeout)
-
-        await game_lobby.callbacks.notify_player_has_bullet(
-            game_lobby.players_remaining, player.id
+        logging.info(
+            f"Waiting for player {player.id} decision for {game_lobby.decision.timeout} seconds"
         )
+        game_lobby.decision.decided.acquire(timeout=game_lobby.decision.timeout)
 
         if game_lobby.decision.decision:
             # Wait for deaths
@@ -124,7 +125,7 @@ class SHOOTING(GameState):
             else:
                 logging.log(f"Player {player.id} shot and no one died")
                 game_lobby.players_remaining.remove(player)
-                game_lobby.callbacks.notify_player_has_died(player.id, 1)
+                await game_lobby.callbacks.notify_player_has_died(player.id, 1)
 
         else:
             # Randomize player death
@@ -155,18 +156,23 @@ class ENDING(GameState):
         cls,
         game_lobby,
     ) -> Union["GameState", None]:
-        logging.info(f"Game ended, winner is {game_lobby.players_remaining.pop().id}")
-        await cls._notify_winner(game_lobby)
-
-        await asyncio.sleep(10)
-        game_lobby.reset()
-        return MOVING
+        return JOINING
 
     @classmethod
     async def init_state(
         cls,
         game_lobby,
-    ): ...
+    ):
+        if len(game_lobby.players_remaining) == 1:
+            logging.info(f"Game ended, winner is {game_lobby.players_remaining[0].id}")
+            await cls._notify_winner(cls, game_lobby)
+        else:
+            logging.info("Game ended, no winner")
+
+        logging.info("Resetting game in 10 seconds ...")
+        await asyncio.sleep(10)
+        game_lobby.reset()
+        await game_lobby.state_check()
 
     async def _notify_winner(cls, game_lobby):
         winner = game_lobby.players_remaining.pop()

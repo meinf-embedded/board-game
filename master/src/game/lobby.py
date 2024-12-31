@@ -1,6 +1,6 @@
 import sys
 from dataclasses import dataclass, field
-from random import choice, randint
+from random import choice
 
 from typing import List, Set, Union
 
@@ -9,7 +9,7 @@ import threading
 
 from game.types import Player, GameState
 from game.callbacks import Callbacks
-from game.states import PlayerState, JOINING, MOVING, SHOOTING, ENDING
+from game.states import PlayerState, JOINING, MOVING, SHOOTING
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
@@ -59,6 +59,9 @@ class GameLobby:
 
     async def add_meeple(self, player_id: str):
         if not self.gamestate == JOINING:
+            logging.error(
+                f"Player {player_id} tried to add meeple in gamestate {self.gamestate}"
+            )
             return
 
         player = self.get_player(player_id, create=True)
@@ -67,6 +70,9 @@ class GameLobby:
 
     async def add_base(self, player_id: str):
         if not self.gamestate == JOINING:
+            logging.error(
+                f"Player {player_id} tried to add base in gamestate {self.gamestate}"
+            )
             return
         player = self.get_player(player_id, create=True)
         player.ready_base = True
@@ -83,6 +89,9 @@ class GameLobby:
 
     async def player_die(self, player_id: str):
         if not self.gamestate == SHOOTING:
+            logging.error(
+                f"Player {player_id} tried to die in gamestate {self.gamestate}"
+            )
             return
 
         player = self.get_player(player_id)
@@ -110,10 +119,17 @@ class GameLobby:
 
     async def player_shoot(self, player_id: str, is_shoot: bool):
         if not self.gamestate == SHOOTING:
+            logging.error(
+                f"Player {player_id} tried to shoot in gamestate {self.gamestate}"
+            )
             return
 
         player = self.get_player(player_id)
         if not player:
+            logging.error(f"Player {player_id} not found")
+            return
+        if not player.state == PlayerState.SHOOTING:
+            logging.error(f"Player {player_id} tried to shoot in state {player.state}")
             return
 
         player.state = PlayerState.IDLE
