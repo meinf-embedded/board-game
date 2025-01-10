@@ -19,10 +19,12 @@ class JOINING(GameState):
         game_lobby,
     ) -> Union["GameState", None]:
         # Check whether everyone that joined is ready
-        if len(game_lobby.players) == game_lobby.players_max and all(
-            [p.is_ready() for p in game_lobby.players]
-        ):
-            game_lobby.players_remaining.append(*game_lobby.players)
+        ready_players = [p.is_ready() for p in game_lobby.players]
+
+        logging.info(f"Ready Players: {ready_players}")
+
+        if len(ready_players) >= game_lobby.players_max and all(ready_players):
+            game_lobby.players_remaining.extend(game_lobby.players)
             return MOVING
 
     @classmethod
@@ -45,7 +47,11 @@ class MOVING(GameState):
         game_lobby,
     ) -> Union["GameState", None]:
         # Check whether everyone has moved
-        if all(player.has_moved for player in game_lobby.players_remaining):
+        logging.info(f"Checking if all players have moved, {game_lobby}")
+        if (
+            all(player.has_moved for player in game_lobby.players_remaining)
+            or len(game_lobby.players_remaining) == 0
+        ):
             return SHOOTING
         await cls._notify_player_moving_turn(game_lobby)
 
@@ -56,18 +62,23 @@ class MOVING(GameState):
     ):
         for player in game_lobby.players_remaining:
             player.state = PlayerState.MOVING
+            player.has_moved = False
         if len(game_lobby.players_remaining) > 0:
             await cls._notify_player_moving_turn(game_lobby)
 
     @classmethod
     async def _notify_player_moving_turn(cls, game_lobby):
-        moving_player = choice(
-            [
-                player
-                for player in game_lobby.players_remaining
-                if player.state == PlayerState.MOVING
-            ]
-        )
+        non_moved = [
+            player
+            for player in game_lobby.players_remaining
+            if player.state == PlayerState.MOVING and not player.has_moved
+        ]
+
+        if not non_moved:
+            logging.info("No players to move")
+            return
+
+        moving_player = choice(non_moved)
         logging.info(f"Player {moving_player.id} moving turn")
         for player in game_lobby.players_remaining:
             await game_lobby.callbacks.notify_player_moving_turn(
@@ -95,7 +106,7 @@ class SHOOTING(GameState):
         cls,
         game_lobby,
     ):
-        game_lobby.decision.decided.acquire()
+        await game_lobby.decision.decided.acquire()
 
         for player in game_lobby.players_remaining:
             player.state = PlayerState.IDLE
@@ -111,40 +122,48 @@ class SHOOTING(GameState):
         await asyncio.create_task(cls.wait_decision(game_lobby, random_player))
 
     async def wait_decision(game_lobby, player):
+
         logging.info(
             f"Waiting for player {player.id} decision for {game_lobby.decision.timeout} seconds"
         )
-        game_lobby.decision.decided.acquire(timeout=game_lobby.decision.timeout)
 
-        if game_lobby.decision.decision:
-            # Wait for deaths
-            logging.log(f"Player {player.id} shot... WAITING FOR DEATHS")
-
-            await asyncio.sleep(game_lobby.death_wait_time)
-            if game_lobby.any_died:
-                game_lobby.any_died = False
-                logging.log(f"Player {player.id} shot and someone died")
-            else:
-                logging.log(f"Player {player.id} shot and no one died")
-                game_lobby.players_remaining.remove(player)
-                await game_lobby.callbacks.notify_player_has_died(player.id, 1)
-
-        else:
-            # Randomize player death
-            die = False
-            if randint(0, 100) > game_lobby.decision.negative_penalty * 100:
-                player.state = PlayerState.DEAD
-                game_lobby.players_remaining.remove(player)
-                die = True
-
-            logging.info(
-                f"Player {player.id} didn't shoot and {'died' if die else 'survived'}"
+        try:
+            await asyncio.wait_for(
+                game_lobby.decision.decided.acquire(), game_lobby.decision.timeout
             )
+        except:
+            ...
 
-            await game_lobby.callbacks.notify_player_has_died(player.id, die)
+        try:
+            if game_lobby.decision.decision:
+                # Wait for deaths
+                logging.info(f"Player {player.id} shot... WAITING FOR DEATHS")
 
-        game_lobby.decision.decided.release()
-        await game_lobby.state_check()
+                await asyncio.sleep(game_lobby.death_wait_time)
+                if game_lobby.any_died:
+                    game_lobby.any_died = False
+                    logging.info(f"Player {player.id} shot and someone died")
+                else:
+                    logging.info(f"Player {player.id} shot and no one died")
+                    game_lobby.players_remaining.remove(player)
+                    await game_lobby.callbacks.notify_player_has_died(player.id, True)
+
+            else:
+                # Randomize player death
+                die = False
+                if randint(0, 100) > game_lobby.decision.negative_penalty * 100:
+                    player.state = PlayerState.DEAD
+                    game_lobby.players_remaining.remove(player)
+                    die = True
+
+                logging.info(
+                    f"Player {player.id} didn't shoot and {'died' if die else 'survived'}"
+                )
+
+                await game_lobby.callbacks.notify_player_has_died(player.id, die)
+        finally:
+            game_lobby.decision.decided.release()
+            await game_lobby.state_check()
 
 
 class ENDING(GameState):

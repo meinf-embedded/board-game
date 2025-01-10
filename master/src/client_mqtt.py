@@ -10,7 +10,7 @@ from game.callbacks import Callbacks
 
 from os import environ
 
-from tasks import player
+from tasks import player, decision
 
 # MQTT settings
 MQTT_BROKER_HOST = str(environ.get("MQTT_BROKER_HOST", "localhost"))
@@ -39,6 +39,7 @@ def init_signal_handler():
 async def run_tasks(mqtt_client: aiomqtt.Client, game_lobby: GameLobby):
     async with asyncio.TaskGroup() as tg:
         tg.create_task(player.run(mqtt_client, game_lobby))
+        tg.create_task(decision.run(mqtt_client, game_lobby))
 
 
 async def main():

@@ -1,3 +1,4 @@
+import asyncio
 import sys
 from dataclasses import dataclass, field
 from random import choice
@@ -16,9 +17,9 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 @dataclass
 class Decision:
-    decided: threading.Semaphore = field(default_factory=threading.Semaphore)
+    decided: asyncio.Semaphore = field(default_factory=asyncio.Semaphore)
     decision: bool = False
-    timeout: int = 10
+    timeout: int = 60
     negative_penalty: float = 0.33
 
 
@@ -34,9 +35,12 @@ class GameLobby:
     decision: Decision = field(default_factory=Decision)
 
     any_died: bool = False
-    death_wait_time: int = 5
+    death_wait_time: int = 10
 
     callbacks: Callbacks = None
+
+    def __str__(self) -> str:
+        return f"GameLobby(gamestate={self.gamestate}, players_max={self.players_max}, players={self.players}, no_shoot_penalty={self.no_shoot_penalty}, decision={self.decision}, any_died={self.any_died})"
 
     async def state_check(self):
         new_state = await self.gamestate.check_state(self)
@@ -84,8 +88,10 @@ class GameLobby:
     def reset(self):
         for player in self.players:
             player.has_moved = False
+            player.ready_meeple = False
+            player.ready_base = False
             player.state = PlayerState.IDLE
-        self.players_remaining = self.players.copy()
+        self.players_remaining = list(self.players.copy())
 
     async def player_die(self, player_id: str):
         if not self.gamestate == SHOOTING:
@@ -100,6 +106,7 @@ class GameLobby:
 
         player.state = PlayerState.DEAD
         self.players_remaining.remove(player)
+        self.any_died = True
         await self.state_check()
 
     async def player_move(self, player_id: str):

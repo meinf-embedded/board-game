@@ -40,4 +40,4 @@ class Callbacks:
             )
 
     async def notify_player_has_died(self, player_id: str, payload):
-        await self._publish(f"player/{player_id}/state/has_died", payload)
+        await self._publish(f"players/{player_id}/state/has_died", payload)

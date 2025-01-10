@@ -26,6 +26,9 @@ class Player:
     def __hash__(self) -> int:
         return hash(self.id)
 
+    def __str__(self) -> str:
+        return f"Player {self.id}: {self.state.name}"
+
 
 class GameState(ABC):
 
