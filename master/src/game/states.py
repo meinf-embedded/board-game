@@ -19,7 +19,9 @@ class JOINING(GameState):
         game_lobby,
     ) -> Union["GameState", None]:
         # Check whether everyone that joined is ready
-        if len(game_lobby.players) == game_lobby.players_max:
+        if len(game_lobby.players) == game_lobby.players_max and all(
+            [p.is_ready() for p in game_lobby.players]
+        ):
             game_lobby.players_remaining.append(*game_lobby.players)
             return MOVING
 

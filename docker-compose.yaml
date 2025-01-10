@@ -1,21 +1,21 @@
 services:
 
-  mqtt-broker:
-    build:
-      context: ./mosquitto
-    restart: unless-stopped
-    ports:
-      - "1883:1883"
-    volumes:
-      - ./mosquitto/log:/mosquitto/log:cached
+  # mqtt-broker:
+  #   build:
+  #     context: ./mosquitto
+  #   restart: unless-stopped
+  #   ports:
+  #     - "1883:1883"
+  #   volumes:
+  #     - ./mosquitto/log:/mosquitto/log:cached
 
   master:
     build: ./master
     environment:
       MAX_PLAYERS: ${MAX_PLAYERS}
-      MQTT_BROKER_HOST: mqtt-broker
-      MQTT_BROKER_PORT: 1883
+      MQTT_BROKER_HOST: ${MQTT_BROKER_HOST}
+      MQTT_BROKER_PORT: ${MQTT_BROKER_PORT}
       USERNAME: ${MASTER_USERNAME}
       PASSWORD: ${MASTER_PASSWORD}
-    depends_on:
-      - mqtt-broker
+    # depends_on:
+    #   - mqtt-broker

@@ -60,7 +60,7 @@ class GameLobby:
     async def add_meeple(self, player_id: str):
         if not self.gamestate == JOINING:
             logging.error(
-                f"Player {player_id} tried to add meeple in gamestate {self.gamestate}"
+                f"Player {player_id} tried to add meeple in gamestate {self.gamestate.value}"
             )
             return
 
@@ -71,7 +71,7 @@ class GameLobby:
     async def add_base(self, player_id: str):
         if not self.gamestate == JOINING:
             logging.error(
-                f"Player {player_id} tried to add base in gamestate {self.gamestate}"
+                f"Player {player_id} tried to add base in gamestate {self.gamestate.value}"
             )
             return
         player = self.get_player(player_id, create=True)
@@ -90,7 +90,7 @@ class GameLobby:
     async def player_die(self, player_id: str):
         if not self.gamestate == SHOOTING:
             logging.error(
-                f"Player {player_id} tried to die in gamestate {self.gamestate}"
+                f"Player {player_id} tried to die in gamestate {self.gamestate.value}"
             )
             return
 
@@ -105,7 +105,7 @@ class GameLobby:
     async def player_move(self, player_id: str):
         if not self.gamestate == MOVING:
             logging.error(
-                f"Player {player_id} tried to move in gamestate {self.gamestate}"
+                f"Player {player_id} tried to move in gamestate {self.gamestate.value}"
             )
             return
 

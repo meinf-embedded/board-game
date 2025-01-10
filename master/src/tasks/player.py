@@ -40,7 +40,7 @@ async def _actions_moved(game_lobby: GameLobby, player_id: str, payload):
 
 
 async def _actions_ready_meeple(game_lobby: GameLobby, player_id: str, payload):
-    logger.info(f"Received {player_id} join message {payload}")
+    logger.info(f"Received player {player_id} ready meeple message {payload}")
 
     if payload:
         await game_lobby.add_meeple(player_id)
@@ -51,7 +51,7 @@ async def _actions_ready_meeple(game_lobby: GameLobby, player_id: str, payload):
 
 
 async def _actions_ready_base(game_lobby: GameLobby, player_id: str, payload):
-    logger.info(f"Received player {player_id} join message {payload}")
+    logger.info(f"Received player {player_id} ready base message {payload}")
 
     if payload:
         await game_lobby.add_base(player_id)
