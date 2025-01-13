@@ -31,7 +31,13 @@ async def _actions_die(game_lobby: GameLobby, player_id: str, payload):
 async def _actions_moved(game_lobby: GameLobby, player_id: str, payload):
     logger.info(f"Received player {player_id} moved message {payload}")
 
-    if game_lobby.get_player(player_id).state != PlayerState.MOVING:
+    player = game_lobby.get_player(player_id)
+
+    if not player:
+        logger.error(f"Player {player_id} not found")
+        return
+
+    if player.state != PlayerState.MOVING:
         logger.info(f"Player {player_id} is not in MOVING state")
         return
 

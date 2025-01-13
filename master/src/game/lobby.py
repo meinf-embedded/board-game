@@ -111,7 +111,7 @@ class GameLobby:
             logging.warning(f"Player {player_id} tried to die with bullet. IGNORING")
             return
 
-        if not self.decision.decision:
+        if not force_death and not self.decision.decision:
             logging.warning(
                 f"Player {player_id} tried to die without shot being shot. IGNORING"
             )
@@ -120,9 +120,10 @@ class GameLobby:
         logging.info(f"Player {player_id} died!")
 
         player.state = PlayerState.DEAD
-        self.players_remaining.remove(player)
-        if self.any_died._value == 0:
-            self.any_died.release()
+        if player in self.players_remaining:
+            self.players_remaining.remove(player)
+            if self.any_died._value == 0:
+                self.any_died.release()
 
     async def player_move(self, player_id: str):
         if not self.gamestate == MOVING:

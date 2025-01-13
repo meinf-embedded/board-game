@@ -26,6 +26,8 @@ class JOINING(GameState):
         if len(ready_players) >= game_lobby.players_max and all(ready_players):
             game_lobby.players_remaining.extend(game_lobby.players)
             return MOVING
+        # else:
+        #     await game_lobby.callbacks.notify_game_state(cls.value())
 
     @classmethod
     async def init_state(
@@ -145,8 +147,12 @@ class SHOOTING(GameState):
 
                 try:
                     await asyncio.sleep(game_lobby.death_wait_time)
+                    try:
+                        await game_lobby.any_died.acquire(timeout=0)
+                    except:
+                        ...
 
-                    if await game_lobby.any_died.acquire(timeout=0):
+                    if game_lobby.any_died._value > 0:
                         logging.info(f"Player {player.id} shot and someone died")
                         while game_lobby.any_died._value > 0:
                             await game_lobby.any_died.acquire()
