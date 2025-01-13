@@ -10,7 +10,7 @@ from game.callbacks import Callbacks
 
 from os import environ
 
-from tasks import player, decision
+from tasks import player, shoot, die
 
 # MQTT settings
 MQTT_BROKER_HOST = str(environ.get("MQTT_BROKER_HOST", "localhost"))
@@ -39,7 +39,8 @@ def init_signal_handler():
 async def run_tasks(mqtt_client: aiomqtt.Client, game_lobby: GameLobby):
     async with asyncio.TaskGroup() as tg:
         tg.create_task(player.run(mqtt_client, game_lobby))
-        tg.create_task(decision.run(mqtt_client, game_lobby))
+        tg.create_task(shoot.run(mqtt_client, game_lobby))
+        tg.create_task(die.run(mqtt_client, game_lobby))
 
 
 async def main():
@@ -59,15 +60,14 @@ async def main():
         callbacks=Callbacks(mqtt_client),
     )
 
-    while True:
-        try:
-            async with mqtt_client:
-                logging.info(f"Connected to MQTT broker")
-                await run_tasks(mqtt_client, game_lobby)
-        except aiomqtt.MqttError as e:
-            logging.info("MQTT connection error, reconnecting...")
-            logging.error(e)
-            await asyncio.sleep(RECONNECT_DELAY)
+    try:
+        async with mqtt_client:
+            logging.info(f"Connected to MQTT broker")
+            await run_tasks(mqtt_client, game_lobby)
+    except aiomqtt.MqttError as e:
+        logging.info("MQTT connection error, reconnecting...")
+        logging.error(e)
+        await asyncio.sleep(RECONNECT_DELAY)
 
 
 if __name__ == "__main__":

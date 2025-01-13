@@ -60,6 +60,8 @@ class MOVING(GameState):
         cls,
         game_lobby,
     ):
+        player_names = [player.id for player in game_lobby.players_remaining]
+        logging.info(f"Initializing moving state with players: {player_names}")
         for player in game_lobby.players_remaining:
             player.state = PlayerState.MOVING
             player.has_moved = False
@@ -139,30 +141,35 @@ class SHOOTING(GameState):
                 # Wait for deaths
                 logging.info(f"Player {player.id} shot... WAITING FOR DEATHS")
 
-                await asyncio.sleep(game_lobby.death_wait_time)
-                if game_lobby.any_died:
-                    game_lobby.any_died = False
-                    logging.info(f"Player {player.id} shot and someone died")
-                else:
-                    logging.info(f"Player {player.id} shot and no one died")
-                    game_lobby.players_remaining.remove(player)
-                    await game_lobby.callbacks.notify_player_has_died(player.id, True)
+                try:
+                    await asyncio.sleep(game_lobby.death_wait_time)
+
+                    if await game_lobby.any_died.acquire(timeout=0):
+                        logging.info(f"Player {player.id} shot and someone died")
+                        while game_lobby.any_died._value > 0:
+                            await game_lobby.any_died.acquire()
+                    else:
+                        logging.info(f"Player {player.id} shot and no one died")
+                        game_lobby.player_die(player.id)
+                        await game_lobby.callbacks.notify_player_has_died(
+                            player.id, True
+                        )
+                except:
+                    ...
 
             else:
                 # Randomize player death
-                die = False
                 if randint(0, 100) > game_lobby.decision.negative_penalty * 100:
-                    player.state = PlayerState.DEAD
-                    game_lobby.players_remaining.remove(player)
-                    die = True
+                    game_lobby.player_die(player.id)
+                    await game_lobby.callbacks.notify_player_has_died(player.id, True)
 
-                logging.info(
-                    f"Player {player.id} didn't shoot and {'died' if die else 'survived'}"
-                )
+                    logging.info(f"Player {player.id} didn't shoot and died")
+                else:
+                    logging.info(f"Player {player.id} didn't shoot and survived")
 
-                await game_lobby.callbacks.notify_player_has_died(player.id, die)
         finally:
             game_lobby.decision.decided.release()
+            game_lobby.decision.decision = False
             await game_lobby.state_check()
 
 
@@ -192,10 +199,9 @@ class ENDING(GameState):
 
         logging.info("Resetting game in 10 seconds ...")
         await asyncio.sleep(10)
-        game_lobby.reset()
         await game_lobby.state_check()
 
     async def _notify_winner(cls, game_lobby):
         winner = game_lobby.players_remaining.pop()
-        await game_lobby.callbacks.notify_player_won(winner.id, 1)
+        await game_lobby.callbacks.notify_player_won(winner.id)
         logging.info(f"Player {winner.id} won")

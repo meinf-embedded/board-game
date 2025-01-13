@@ -6,7 +6,6 @@ from random import choice
 from typing import List, Set, Union
 
 import logging
-import threading
 
 from game.types import Player, GameState
 from game.callbacks import Callbacks
@@ -34,7 +33,7 @@ class GameLobby:
 
     decision: Decision = field(default_factory=Decision)
 
-    any_died: bool = False
+    any_died: asyncio.Semaphore = field(default_factory=lambda: asyncio.Semaphore(0))
     death_wait_time: int = 10
 
     callbacks: Callbacks = None
@@ -64,7 +63,7 @@ class GameLobby:
     async def add_meeple(self, player_id: str):
         if not self.gamestate == JOINING:
             logging.error(
-                f"Player {player_id} tried to add meeple in gamestate {self.gamestate.value}"
+                f"Player {player_id} tried to add meeple in gamestate {self.gamestate.value()}"
             )
             return
 
@@ -75,7 +74,7 @@ class GameLobby:
     async def add_base(self, player_id: str):
         if not self.gamestate == JOINING:
             logging.error(
-                f"Player {player_id} tried to add base in gamestate {self.gamestate.value}"
+                f"Player {player_id} tried to add base in gamestate {self.gamestate.value()}"
             )
             return
         player = self.get_player(player_id, create=True)
@@ -91,12 +90,15 @@ class GameLobby:
             player.ready_meeple = False
             player.ready_base = False
             player.state = PlayerState.IDLE
-        self.players_remaining = list(self.players.copy())
+        self.players_remaining = list()
+        self.players = set()
+        self.player_ids = set()
+        self.any_died = asyncio.Semaphore(0)
 
-    async def player_die(self, player_id: str):
+    def player_die(self, player_id: str):
         if not self.gamestate == SHOOTING:
             logging.error(
-                f"Player {player_id} tried to die in gamestate {self.gamestate.value}"
+                f"Player {player_id} tried to die in gamestate {self.gamestate.value()}"
             )
             return
 
@@ -104,15 +106,17 @@ class GameLobby:
         if not player:
             return
 
+        logging.info(f"Player {player_id} died!")
+
         player.state = PlayerState.DEAD
         self.players_remaining.remove(player)
-        self.any_died = True
-        await self.state_check()
+        if self.any_died._value == 0:
+            self.any_died.release()
 
     async def player_move(self, player_id: str):
         if not self.gamestate == MOVING:
             logging.error(
-                f"Player {player_id} tried to move in gamestate {self.gamestate.value}"
+                f"Player {player_id} tried to move in gamestate {self.gamestate.value()}"
             )
             return
 
@@ -135,7 +139,7 @@ class GameLobby:
         if not player:
             logging.error(f"Player {player_id} not found")
             return
-        if not player.state == PlayerState.SHOOTING:
+        if not player.state == PlayerState.WITH_BULLET:
             logging.error(f"Player {player_id} tried to shoot in state {player.state}")
             return
 

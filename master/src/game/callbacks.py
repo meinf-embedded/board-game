@@ -25,8 +25,8 @@ class Callbacks:
             payload,
         )
 
-    async def notify_player_won(self, player_id: str, payload):
-        await self._publish(f"players/{player_id}/state/has_won", payload)
+    async def notify_player_won(self, player_id: str):
+        await self._publish(f"players/{player_id}/state/has_won", True)
 
     async def notify_player_has_bullet(
         self,
