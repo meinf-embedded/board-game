@@ -95,7 +95,7 @@ class GameLobby:
         self.player_ids = set()
         self.any_died = asyncio.Semaphore(0)
 
-    def player_die(self, player_id: str):
+    def player_die(self, player_id: str, force_death=False):
         if not self.gamestate == SHOOTING:
             logging.error(
                 f"Player {player_id} tried to die in gamestate {self.gamestate.value()}"
@@ -104,6 +104,17 @@ class GameLobby:
 
         player = self.get_player(player_id)
         if not player:
+            return
+
+        # In case that the shooter mistakenly sends die when he is shooting
+        if not force_death and player.state == PlayerState.WITH_BULLET:
+            logging.warning(f"Player {player_id} tried to die with bullet. IGNORING")
+            return
+
+        if not self.decision.decision:
+            logging.warning(
+                f"Player {player_id} tried to die without shot being shot. IGNORING"
+            )
             return
 
         logging.info(f"Player {player_id} died!")
@@ -143,6 +154,5 @@ class GameLobby:
             logging.error(f"Player {player_id} tried to shoot in state {player.state}")
             return
 
-        player.state = PlayerState.IDLE
         self.decision.decision = is_shoot
         self.decision.decided.release()

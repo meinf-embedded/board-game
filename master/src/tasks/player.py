@@ -6,9 +6,26 @@ from game.lobby import GameLobby, PlayerState
 
 logger = logging.getLogger(__name__)
 
-TOPICS = [
-    f"players/+/actions/{action}" for action in ["move", "ready/meeple", "ready/base"]
-]
+
+TOPIC = "players/+/actions/#"
+
+
+async def _actions_shoot(game_lobby: GameLobby, player_id: str, payload):
+    logger.info(f"Received player {player_id} shoot message {payload}")
+
+    is_shoot = payload.decode("UTF-8") == "True"
+
+    game_lobby.decision.decision = is_shoot
+    await game_lobby.player_shoot(player_id, is_shoot)
+
+
+async def _actions_die(game_lobby: GameLobby, player_id: str, payload):
+    logger.info(
+        f"Received player {player_id} die message {payload}, player state: {game_lobby.get_player(player_id).state}"
+    )
+
+    if payload:
+        game_lobby.player_die(player_id)
 
 
 async def _actions_moved(game_lobby: GameLobby, player_id: str, payload):
@@ -51,16 +68,22 @@ async def _listen(game_lobby: GameLobby, message: aiomqtt.Message):
         return
 
     if message.topic.matches("players/+/actions/move"):
-        await asyncio.create_task(
+        return asyncio.create_task(
             _actions_moved(game_lobby, player_id, message.payload)
         )
     elif message.topic.matches("players/+/actions/ready/meeple"):
-        await asyncio.create_task(
+        return asyncio.create_task(
             _actions_ready_meeple(game_lobby, player_id, message.payload)
         )
     elif message.topic.matches("players/+/actions/ready/base"):
-        await asyncio.create_task(
+        return asyncio.create_task(
             _actions_ready_base(game_lobby, player_id, message.payload)
+        )
+    elif message.topic.matches("players/+/actions/die"):
+        return asyncio.create_task(_actions_die(game_lobby, player_id, message.payload))
+    elif message.topic.matches("players/+/actions/shoot"):
+        return asyncio.create_task(
+            _actions_shoot(game_lobby, player_id, message.payload)
         )
     else:
         logger.error(f"Unknown subtopic {message.topic}")
@@ -68,10 +91,9 @@ async def _listen(game_lobby: GameLobby, message: aiomqtt.Message):
 
 async def run(mqtt_client: aiomqtt.Client, game_lobby: GameLobby):
     async with mqtt_client.messages() as messages:
-        for topic in TOPICS:
-            await mqtt_client.subscribe(topic)
+        await mqtt_client.subscribe(TOPIC)
 
-        logger.info(f"Subscribed to topics: {TOPICS}")
+        logger.info(f"Subscribed to topics: {TOPIC}")
 
         async for message in messages:
             asyncio.ensure_future(_listen(game_lobby, message))

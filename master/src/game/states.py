@@ -114,11 +114,13 @@ class SHOOTING(GameState):
             player.state = PlayerState.IDLE
         random_player = game_lobby.get_random_player()
 
-        logging.info(f"Player {random_player.id} has bullet")
-
         random_player.state = PlayerState.WITH_BULLET
         await game_lobby.callbacks.notify_player_has_bullet(
             game_lobby.players_remaining, random_player.id
+        )
+
+        logging.info(
+            f"Player {random_player.id} has bullet, state: {random_player.state}"
         )
 
         await asyncio.create_task(cls.wait_decision(game_lobby, random_player))
@@ -150,7 +152,7 @@ class SHOOTING(GameState):
                             await game_lobby.any_died.acquire()
                     else:
                         logging.info(f"Player {player.id} shot and no one died")
-                        game_lobby.player_die(player.id)
+                        game_lobby.player_die(player.id, force_death=True)
                         await game_lobby.callbacks.notify_player_has_died(
                             player.id, True
                         )
@@ -160,7 +162,7 @@ class SHOOTING(GameState):
             else:
                 # Randomize player death
                 if randint(0, 100) > game_lobby.decision.negative_penalty * 100:
-                    game_lobby.player_die(player.id)
+                    game_lobby.player_die(player.id, force_death=True)
                     await game_lobby.callbacks.notify_player_has_died(player.id, True)
 
                     logging.info(f"Player {player.id} didn't shoot and died")
@@ -170,6 +172,8 @@ class SHOOTING(GameState):
         finally:
             game_lobby.decision.decided.release()
             game_lobby.decision.decision = False
+            player.state = PlayerState.IDLE
+
             await game_lobby.state_check()
 
 
