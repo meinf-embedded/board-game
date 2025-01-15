@@ -6,4 +6,4 @@ The [Game Rules](https://docs.google.com/document/d/1gMqOfDRfHpMNa9OvMC5w9BUMWLi
 
 Jordi and Christian repository: https://github.com/GEI-duo/UCES_project
 
-Game flow: ![game-flow](https://github.com/user-attachments/assets/3121dccf-2f21-4ec0-95e7-1fe5595ba3d1)
+Game flow: ![game-flow](https://github.com/user-attachments/assets/89daa63d-2ee7-4cf2-8296-fc86eb676168)
